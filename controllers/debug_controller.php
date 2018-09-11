@@ -27,7 +27,6 @@ class Debug_controller
 
 	public function show($to_be_shown, $tags = array())
 	{
-		// require_once HARM_START_UP_BASE_PATH . '/libraries/show.php';
 		require_once HARM_START_UP_BASE_PATH . '/libraries/Show.php';
 
 		if (!$this->show) {
@@ -40,17 +39,7 @@ class Debug_controller
 		if (file_exists(HARM_START_UP_BASE_PATH . '/files/record') && file_get_contents(HARM_START_UP_BASE_PATH . '/files/record') === 'ON') {
 			$this->show->prepaire($to_be_shown, $tags);
 		}
-		/*
-		if (is_null($this->output_buffer) && file_exists(HARM_START_UP_BASE_PATH . '/files/record') && file_get_contents(HARM_START_UP_BASE_PATH . '/files/record') === 'ON') {
-			$info = $this->show->get_prepaired();
-			file_put_contents(HARM_START_UP_BASE_PATH . '/files/recorded', $info, FILE_APPEND | LOCK_EX);
-			$this->show->clear();
-		} elseif (is_array($this->output_buffer)) {
-			$this->output_buffer[] = $this->show->get_prepaired();
-			$this->show->clear();
-		}
-		 *
-		 */
+
 		return $this;
 	}
 
