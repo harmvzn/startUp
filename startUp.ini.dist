@@ -1,3 +1,7 @@
 ; de folder where startUp is located
 
 basePath = /var/notubiz/repositories/startUp
+
+; de folder where de dump files will be located
+; if empty : basePath/files
+; filesPath =

@@ -36,7 +36,7 @@ class Debug_controller
 			$this->show->max_string_length = $this->max_string_length;
 		}
 
-		if (file_exists(HARM_START_UP_BASE_PATH . '/files/record') && file_get_contents(HARM_START_UP_BASE_PATH . '/files/record') === 'ON') {
+		if (file_exists(HARM_START_UP_FILES_PATH . '/record') && file_get_contents(HARM_START_UP_FILES_PATH . '/record') === 'ON') {
 			$this->show->prepaire($to_be_shown, $tags);
 		}
 

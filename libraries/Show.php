@@ -38,7 +38,7 @@ class Show
 			return '';
 		}
 
-		$dir = HARM_START_UP_BASE_PATH . '/files/export/';
+		$dir = HARM_START_UP_FILES_PATH . '/export/';
 
 		$label = $this->get_label_prefix($tags);
 		$main_outputs_id = $output->main_object->get_id()->export_id;

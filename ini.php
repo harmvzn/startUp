@@ -47,10 +47,9 @@ class start_up_ini
 
 	private function init()
 	{
-		$filesFolder = HARM_START_UP_BASE_PATH . '/files';
-		if (!is_dir($filesFolder)) {
-			mkdir($filesFolder);
-		    $exportFolder = $filesFolder . '/export';
+		if (!is_dir(HARM_START_UP_FILES_PATH)) {
+			mkdir(HARM_START_UP_FILES_PATH);
+		    $exportFolder = HARM_START_UP_FILES_PATH . '/export';
 			mkdir($exportFolder);
 		    $referencesFolder = $exportFolder . '/references';
 			mkdir($referencesFolder);

@@ -14,6 +14,12 @@ if ($inifile) {
 	$ini = parse_ini_file($inifile);
 	define('HARM_START_UP_BASE_PATH', $ini['basePath']);
 
+	if (!empty($ini['filesPath'])) {
+		define('HARM_START_UP_FILES_PATH', $ini['filesPath']);
+	} else {
+		define('HARM_START_UP_FILES_PATH', HARM_START_UP_BASE_PATH . '/files');
+	}
+
 	if (!isset($_GET['disable_localhost_debug'])) {
 		require_once HARM_START_UP_BASE_PATH . '/ini.php';
 		new Harm\start_up_ini;
