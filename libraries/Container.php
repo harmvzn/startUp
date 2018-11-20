@@ -293,7 +293,9 @@ class array_type extends All_type
 		{
 			$key_object = $this->get_new_object($key, $depth);
 			$value_object = $this->get_new_object($value, $depth);
-			$this->value[$key_object->get_id()->value] = $value_object->get_id()->value;
+			if ($key_object && $value_object) {
+				$this->value[$key_object->get_id()->value] = $value_object->get_id()->value;
+			}
 		}
 		return $this->get_id()->value;
 	}
