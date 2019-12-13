@@ -355,11 +355,13 @@ class object_type extends All_type
 		}
 		$depth--;
 		$this->depth = $depth;
-
 		if ($object instanceof \ReflectionClass) {
 			$this->reflection = $object;
 			$this->value = $object->_origin_object;
 		} else {
+			if (is_resource($object) || $this->is_excluded_object($object)) {
+				$object = $this->get_resource_stand_in($object);
+			}
 			$this->reflection = new \ReflectionClass($object);
                         if ($this->reflection->isCloneable()) {
 							try {
@@ -457,7 +459,10 @@ class object_type extends All_type
 					$prop_export->per_instance = false;
 				}
 				$prop_export->field = $prop->getName();
+				$error_reporting = ini_get('error_reporting');
+				error_reporting(0);
 				$prop_export->value = $this->get_property_value_export($prop->getValue($this->value), $nesting);
+				error_reporting($error_reporting);
 				$export->properties[] = $prop_export;
 			}
 		}
@@ -498,11 +503,32 @@ class object_type extends All_type
 				return $object->harm_container_object_token;
 			}
 			$object->harm_container_object_token = uniqid();
-			return $object->harm_container_object_token;
+			if (isset($object->harm_container_object_token)) {
+				return $object->harm_container_object_token;
+			}
+			return 1;
 
 		}
 	}
 
+	private function get_resource_stand_in($object)
+	{
+		$stand_in = new \stdClass();
+		$stand_in->message = "std() stand in for: " . get_class($object);
+		return $stand_in;
+	}
+
+	private function is_excluded_object($object)
+	{
+		$excluded_object = getenv('excluded_object');
+		if (!$excluded_object) {
+			$excluded_object = get_cfg_var('excluded_object');
+		}
+		if (! $excluded_object) {
+			return false;
+		}
+		return preg_match('/(?<![^,\s])' . addslashes(get_class($object)) . '(?![^,\s])/', $excluded_object);
+	}
 }
 
 class Nesting {
