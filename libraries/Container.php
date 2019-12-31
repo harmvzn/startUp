@@ -75,12 +75,20 @@ class Container
 		self::$elements[$this->get_container_id()][$key] = $value;
 	}
 
+	/**
+	 * @param int | Container_identifier_8394837
+	 * @return Container
+	 */
 	public final function get_from_elements($key) {
-		if (isset(self::$elements[$this->get_container_id()][$key])) {
+		if ($key instanceof Container_identifier_8394837) {
+			if (isset(self::$elements[$key->container_id][$key->value])) {
+				return self::$elements[$key->container_id][$key->value];
+			}
+		} else if (isset(self::$elements[$this->get_container_id()][$key])) {
 			return self::$elements[$this->get_container_id()][$key];
 		}
 		$unkown = new unknown_type_type($this->get_new_id(), $this->get_container_id());
-		$unkown->set_var('Container::get_from_elements() = null');
+		$unkown->set_var('Container::get_from_elements() = null (Element could not be found)');
 		return $unkown;
 	}
 
@@ -164,6 +172,9 @@ class All_type extends Container
 	private $id = null;
 	protected $simple = true;
 	protected $short = '-';
+	/**
+	 * @var Container_identifier_8394837
+	 */
 	protected $reference_to = null;
 
 	public function __construct( $id, $container_id)
@@ -209,9 +220,6 @@ class All_type extends Container
 		return var_export($this->value, true);
 	}
 
-	public function is_reference_to() {
-		return $this->reference_to;
-	}
 }
 
 class boolean_type extends All_type
@@ -375,7 +383,7 @@ class object_type extends All_type
                         }
 		}
 
-		$this->set_object_as_allready_processed($object, $this->object_hash, $this->get_id()->value, $object_token);
+		$this->set_object_as_allready_processed($object, $this->object_hash, $this->get_id(), $object_token);
 		return $this->get_id()->value;
 	}
 
@@ -391,8 +399,8 @@ class object_type extends All_type
 		}
 
 		if ($this->reference_to) {
-                        if ($nesting->is_circular($this->reference_to)) {
-			    $circular_ref = new Circular_reference($this->reference_to, $nesting->get_ancestors());
+                        if ($nesting->is_circular($this->reference_to->value)) {
+			    $circular_ref = new Circular_reference($this->reference_to->value, $nesting->get_ancestors());
                             return $circular_ref;
                         }
 			return $this->get_from_elements($this->reference_to)->construct_export($nesting->meet_next($this->get_id()->value));
