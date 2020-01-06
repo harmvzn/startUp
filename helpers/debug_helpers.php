@@ -8,15 +8,15 @@ if (!function_exists('std'))
 	 * _output_type
 	 * _output_depth
 	 * _max_string
-	 * @global \Harm\Debug_controller $_d_
-	 * @return \Harm\Debug_controller
+	 * @global \StartUp\Debug_controller $_d_
+	 * @return \StartUp\Debug_controller
 	 */
 	function std()
 	{
 		global $_d_;
 		$args = func_get_args();
 		if (!isset($_d_)) {
-			$_d_ = new \Harm\Debug_controller();
+			$_d_ = new \StartUp\Debug_controller();
 		}
 		$return = null;
 		if ($args) {
@@ -42,7 +42,7 @@ if ( ! function_exists('_exception_handler'))
 	function _exception_handler($exception)
 	{		
 		//added this:
-		Harm\start_up_ini::custom_exception_handler($exception);
+		StartUp\start_up_ini::custom_exception_handler($exception);
 		//continue normal code:
 		$_error =& load_class('Exceptions', 'core');
 		$_error->log_exception('error', 'Exception: '.$exception->getMessage(), $exception->getFile(), $exception->getLine());
@@ -63,7 +63,7 @@ if ( ! function_exists('_error_handler'))
 	function _error_handler($severity = E_NOTICE, $message = '', $filepath = '', $line = 0)
 	{
 		//added this:
-		Harm\start_up_ini::custom_error_handler($severity, $message, $filepath, $line);
+		StartUp\start_up_ini::custom_error_handler($severity, $message, $filepath, $line);
 
 		$is_error = (((E_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR) & $severity) === $severity);
 

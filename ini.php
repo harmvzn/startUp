@@ -3,10 +3,10 @@
  * Debug ini.php is used to install the debugger
  *
  */
-namespace Harm;
+namespace StartUp;
 
-require_once HARM_START_UP_BASE_PATH . '/helpers/debug_helpers.php';
-require_once HARM_START_UP_BASE_PATH . '/controllers/debug_controller.php';
+require_once START_UP_BASE_PATH . '/helpers/debug_helpers.php';
+require_once START_UP_BASE_PATH . '/controllers/debug_controller.php';
 
 class start_up_ini
 {
@@ -47,9 +47,9 @@ class start_up_ini
 
 	private function init()
 	{
-		if (!is_dir(HARM_START_UP_FILES_PATH)) {
-			mkdir(HARM_START_UP_FILES_PATH);
-		    $exportFolder = HARM_START_UP_FILES_PATH . '/export';
+		if (!is_dir(START_UP_FILES_PATH)) {
+			mkdir(START_UP_FILES_PATH);
+		    $exportFolder = START_UP_FILES_PATH . '/export';
 			mkdir($exportFolder);
 		    $referencesFolder = $exportFolder . '/references';
 			mkdir($referencesFolder);
@@ -59,9 +59,9 @@ class start_up_ini
 	private function installErrorHandlers()
 	{
 		if (empty(getenv('ignore_errors')) && empty(get_cfg_var('ignore_errors'))) {
-			set_error_handler('\\Harm\\Start_up_ini::custom_error_handler');
+			set_error_handler('\\StartUp\\Start_up_ini::custom_error_handler');
 		}
-		set_exception_handler('\\Harm\\Start_up_ini::custom_exception_handler');
+		set_exception_handler('\\StartUp\\Start_up_ini::custom_exception_handler');
 	}
 }
 

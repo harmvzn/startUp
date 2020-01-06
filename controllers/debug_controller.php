@@ -1,13 +1,13 @@
 <?php
 
-namespace Harm;
+namespace StartUp;
 
 class Debug_controller
 {
-	/** @var \Harm\Show */
+	/** @var \StartUp\Show */
 	private $show = null;
 	private $output_type = 'html';
-	private $output_depth = 3;
+	private $output_depth = OUTPUT_DEPTH;
 	private $output_buffer;
 	private $max_string_length = 100;
 	private static $backlog = array();
@@ -27,16 +27,16 @@ class Debug_controller
 
 	public function show($to_be_shown, $tags = array())
 	{
-		require_once HARM_START_UP_BASE_PATH . '/libraries/Show.php';
+		require_once START_UP_BASE_PATH . '/libraries/Show.php';
 
 		if (!$this->show) {
-			$this->show = new \Harm\Show();
+			$this->show = new \StartUp\Show();
 			$this->show->output_type = $this->output_type;
 			$this->show->max_depth = $this->output_depth;
 			$this->show->max_string_length = $this->max_string_length;
 		}
 
-		if (file_exists(HARM_START_UP_FILES_PATH . '/record') && file_get_contents(HARM_START_UP_FILES_PATH . '/record') === 'ON') {
+		if (file_exists(START_UP_FILES_PATH . '/record') && file_get_contents(START_UP_FILES_PATH . '/record') === 'ON') {
 			$this->show->prepaire($to_be_shown, $tags);
 		}
 

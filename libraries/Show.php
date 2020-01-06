@@ -1,8 +1,8 @@
 <?php
 
-namespace Harm;
+namespace StartUp;
 
-require_once HARM_START_UP_BASE_PATH . '/libraries/Container.php';
+require_once START_UP_BASE_PATH . '/libraries/Container.php';
 
 class Show
 {
@@ -30,7 +30,7 @@ class Show
 
 	public function prepaire($to_be_shown, $tags = array(), $first = true)
 	{
-		$container = new \Harm\Container($this->max_depth);
+		$container = new \StartUp\Container($this->max_depth);
 		$container->set_var($to_be_shown);
 		$output = $container->construct_export();
 
@@ -38,7 +38,7 @@ class Show
 			return '';
 		}
 
-		$dir = HARM_START_UP_FILES_PATH . '/export/';
+		$dir = START_UP_FILES_PATH . '/export/';
 
 		$label = $this->get_label_prefix($tags);
 		$main_outputs_id = $output->main_object->get_id()->export_id;

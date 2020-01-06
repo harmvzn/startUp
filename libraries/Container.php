@@ -1,15 +1,12 @@
 <?php
-namespace Harm;
+namespace StartUp;
 
-require_once HARM_START_UP_BASE_PATH . '/libraries/export.php';
+require_once START_UP_BASE_PATH . '/libraries/export.php';
 
 ini_set('xdebug.max_nesting_level', 1000);
 
-
 class Container
 {
-        const IS_DUBLICATE_ARRAY_KEY = '88u484uhgasj4849__+DS:{S"@~SDFE#DS$S';
-    
 	static $known_types = array(
 		'boolean',
 		'integer',
@@ -23,7 +20,7 @@ class Container
 	);
 	/**
 	 *
-	 * @var \Harm\All_type[]
+	 * @var \StartUp\All_type[]
 	 */
 	static $elements = array();
 	static $max_depth = 1;        
@@ -45,7 +42,7 @@ class Container
 	{
 		$type = gettype($var);
 		if (in_array($type, self::$known_types)) {
-			$type_object_name = '\Harm\\'.$type.'_type';
+			$type_object_name = '\StartUp\\'.$type.'_type';
 			$type_object = new $type_object_name($this->get_new_id(), $this->get_container_id());
 			$this->add_to_elements($type_object->get_id()->value, $type_object);
 			$type_object->set_var($var);
@@ -109,14 +106,14 @@ class Container
 	/**
 	 *
 	 * @param type $var
-	 * @return \Harm\All_type
+	 * @return \StartUp\All_type
 	 */
 	protected function get_new_object($var, $depth)
 	{
 		$type = gettype($var);
 		if (in_array($type, self::$known_types)) {
                         $type = $type === 'unknown type' ? 'unknown_type' : $type;
-			$type_object_name = '\Harm\\'.$type.'_type';
+			$type_object_name = '\StartUp\\'.$type.'_type';
 			$type_object = new $type_object_name($this->get_new_id(), $this->get_container_id());
 			$this->add_to_elements($type_object->get_id()->value, $type_object);
 			$type_object->set_var($var, $depth);
@@ -128,7 +125,7 @@ class Container
 	}
 	/**
 	 *
-	 * @return \Harm\All_type[]
+	 * @return \StartUp\All_type[]
 	 */
 	public function get_elements()
 	{
@@ -141,7 +138,7 @@ class Container
 			return;
 		}
 
-		$export = new \Harm\Main_export();
+		$export = new \StartUp\Main_export();
 		$export->main_object = $this->get_from_elements($this->main_element_id);
 		$export->reference_objects = $this->reference_objects;
 
@@ -179,7 +176,7 @@ class All_type extends Container
 
 	public function __construct( $id, $container_id)
 	{
-		$this->id = new \Harm\Container_identifier_8394837($id, $container_id);
+		$this->id = new \StartUp\Container_identifier_8394837($id, $container_id);
 	}
 
 	public function set_var($var)
@@ -316,20 +313,20 @@ class array_type extends All_type
 		}
 		$nesting->hello($this->get_id()->value);
 
-		$export = new \Harm\Array_export();
+		$export = new \StartUp\Array_export();
 		$export->id = $this->get_id()->export_id;
 		if (is_null($this->value)) {
 			$export->out_of_depth = true;
 			return $export;
 		}
 		foreach ($this->value as $key_id => $value_id) {
-			$row = new \Harm\Array_row_export();
+			$row = new \StartUp\Array_row_export();
 			$row->key = $this->get_from_elements($key_id)->construct_export();
 			$row->value = $this->get_from_elements($value_id)->construct_export($nesting->meet_next($this->get_id()->value));
 			$export->value[] = $row;
 		}
 		$this->add_to_reference_objects($export->id, $export);
-		return new \Harm\Reference($export->id);
+		return new \StartUp\Reference($export->id);
 	}
 }
 
@@ -405,13 +402,13 @@ class object_type extends All_type
                         }
 			return $this->get_from_elements($this->reference_to)->construct_export($nesting->meet_next($this->get_id()->value));
 		} else if ($nesting->get_depth() > self::$max_depth) {
-		    $export = new \Harm\Object_export();
+		    $export = new \StartUp\Object_export();
 		    $export->id = $this->get_id()->export_id;
 		    $export->out_of_depth = true;
 		    return $export;
 		}
 
-		$export = new \Harm\Object_export();
+		$export = new \StartUp\Object_export();
 		$export->id = $this->get_id()->export_id;
 
 		if (!$this->value) {
@@ -421,11 +418,11 @@ class object_type extends All_type
 		}
 		$this->add_to_reference_objects($export->id, $export);
 
-		$this->export_reference = new \Harm\Reference($export->id);
+		$this->export_reference = new \StartUp\Reference($export->id);
 		return $this->export_reference;
 	}
 
-	private function process_reflection_class(\ReflectionClass $reflect, \Harm\Object_export $export, $nesting)
+	private function process_reflection_class(\ReflectionClass $reflect, \StartUp\Object_export $export, $nesting)
 	{
 		$ancestor_reflect = $reflect->getParentClass();
 		if ($ancestor_reflect) {
@@ -444,7 +441,7 @@ class object_type extends All_type
 
 		if ($this->value instanceof \stdClass) {
 			foreach ((array) $this->value as $key => $value) {
-				$prop_export = new \Harm\Property_export();
+				$prop_export = new \StartUp\Property_export();
 				$prop_export->field = $key;
 				$prop_export->value = $this->get_property_value_export($value, $nesting);
 				$export->properties[] = $prop_export;
@@ -454,7 +451,7 @@ class object_type extends All_type
 				if (isset($reflect->_origin_properties[$prop->getName()])) {
 					continue; // prop is overriden
 				}
-				$prop_export = new \Harm\Property_export();
+				$prop_export = new \StartUp\Property_export();
 				if ($prop->isPrivate()) {
 					$prop_export->visibility = 'private';
 					$prop->setAccessible(true);
@@ -498,21 +495,21 @@ class object_type extends All_type
 				}
 			}
 			// we can not check if this object is unique
-			if (isset($object->harm_container_object_token)) {
-				return $object->harm_container_object_token;
+			if (isset($object->container_object_token)) {
+				return $object->container_object_token;
 			}
-			$object->harm_container_object_token = uniqid();
-			return $object->harm_container_object_token;
+			$object->container_object_token = uniqid();
+			return $object->container_object_token;
 	    } catch (\Exception $ex) {
 			if ($object instanceof \Closure) {
 				return uniqid();
 			}
-			if (isset($object->harm_container_object_token)) {
-				return $object->harm_container_object_token;
+			if (isset($object->container_object_token)) {
+				return $object->container_object_token;
 			}
-			$object->harm_container_object_token = uniqid();
-			if (isset($object->harm_container_object_token)) {
-				return $object->harm_container_object_token;
+			$object->container_object_token = uniqid();
+			if (isset($object->container_object_token)) {
+				return $object->container_object_token;
 			}
 			return 1;
 
