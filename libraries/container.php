@@ -18,16 +18,11 @@ class Container
 		'NULL',
 		'unknown type'
 	);
-	/**
-	 *
-	 * @var \StartUp\All_type[]
-	 */
-	static $elements = array();
+	/* @var \StartUp\All_type[][] */
+	static $elements = [];
 	static $max_depth = 1;        
 	private $main_element_id = null;
-	/**
-	 * @var \stdClass
-	 */
+	/* @var \stdClass */
 	private $reference_objects;
 	protected static $known_objects = [];
 
@@ -35,14 +30,14 @@ class Container
 		self::$max_depth = $max_depth;
 		$this->add_to_elements($this->get_container_id(), $this);
 		$this->reference_objects = new \stdClass();
-		// $this->reference_objects->set = [];
 	}
 
 	public function set_var($var)
 	{
 		$type = gettype($var);
 		if (in_array($type, self::$known_types)) {
-			$type_object_name = '\StartUp\\'.$type.'_type';
+			$type_object_name = '\StartUp\\' . $type . '_type';
+			/* @var $type_object All_type */
 			$type_object = new $type_object_name($this->get_new_id(), $this->get_container_id());
 			$this->add_to_elements($type_object->get_id()->value, $type_object);
 			$type_object->set_var($var);
@@ -50,25 +45,28 @@ class Container
 		}
 	}
 
-	public function get_object_allready_processed_reference( $object, $object_token ) {
-		if ( ! is_object($object)) {
-			return;
+	public function get_object_allready_processed_reference($object, $object_token)
+	{
+		if (!is_object($object)) {
+			return null;
 		}
 		$object_hash = spl_object_hash($object);
 		if (!empty(self::$known_objects[$object_hash][$object_token])) {
 			return self::$known_objects[$object_hash][$object_token];
 		}
-		// return null;
+		return null;
 	}
 
-	public function set_object_as_allready_processed( $object, $object_hash, $reference, $object_token) {
-		if ( ! is_object($object)) {
-			return;
+	public function set_object_as_allready_processed($object, $object_hash, $reference, $object_token)
+	{
+		if (!is_object($object)) {
+			return null;
 		}
 		self::$known_objects[$object_hash][$object_token] = $reference;
 	}
 
-	public final function add_to_elements($key, $value) {
+	public final function add_to_elements($key, $value)
+	{
 		self::$elements[$this->get_container_id()][$key] = $value;
 	}
 
@@ -76,7 +74,8 @@ class Container
 	 * @param int | Container_identifier_8394837
 	 * @return Container
 	 */
-	public final function get_from_elements($key) {
+	public final function get_from_elements($key)
+	{
 		if ($key instanceof Container_identifier_8394837) {
 			if (isset(self::$elements[$key->container_id][$key->value])) {
 				return self::$elements[$key->container_id][$key->value];
@@ -84,28 +83,30 @@ class Container
 		} else if (isset(self::$elements[$this->get_container_id()][$key])) {
 			return self::$elements[$this->get_container_id()][$key];
 		}
-		$unkown = new unknown_type_type($this->get_new_id(), $this->get_container_id());
-		$unkown->set_var('Container::get_from_elements() = null (Element could not be found)');
-		return $unkown;
+		$unknown = new unknown_type_type($this->get_new_id(), $this->get_container_id());
+		$unknown->set_var('Container::get_from_elements() = null (Element could not be found)');
+		return $unknown;
 	}
 
-	public final function get_new_id() {
-		if (!isset(self::$elements[$this->get_container_id()])) {
+	public final function get_new_id()
+	{
+		if (!isset(self::$elements[$this->get_container_id()]))
+		{
 			self::$elements[$this->get_container_id()] = [];
 			return 0;
 		}
 		return count(self::$elements[$this->get_container_id()]);
 	}
 
-	public final function add_to_reference_objects( $key, $object) {
+	public final function add_to_reference_objects( $key, $object)
+	{
 		if ($object instanceof Reference || $object instanceof Export) {
 			$this->get_from_elements($this->get_container_id())->reference_objects->$key = $object;
 		}
 	}
 
 	/**
-	 *
-	 * @param type $var
+	 * @param All_type | int | string $var
 	 * @return \StartUp\All_type
 	 */
 	protected function get_new_object($var, $depth)
@@ -113,29 +114,33 @@ class Container
 		$type = gettype($var);
 		if (in_array($type, self::$known_types)) {
                         $type = $type === 'unknown type' ? 'unknown_type' : $type;
-			$type_object_name = '\StartUp\\'.$type.'_type';
+			$type_object_name = '\StartUp\\' . $type . '_type';
 			$type_object = new $type_object_name($this->get_new_id(), $this->get_container_id());
+			/* @var $type_object All_type */
 			$this->add_to_elements($type_object->get_id()->value, $type_object);
 			$type_object->set_var($var, $depth);
 			return $type_object;
 		}
+		return null;
 	}
-	protected function get_container_id() {
+
+	protected function get_container_id()
+	{
 		return spl_object_hash($this);
 	}
+
 	/**
-	 *
-	 * @return \StartUp\All_type[]
+	 * @return \StartUp\All_type[][]
 	 */
 	public function get_elements()
 	{
 		return self::$elements;
 	}
 
-	public function construct_export()
+	public function construct_export(Nesting $nesting = null)
 	{
 		if (is_null($this->main_element_id)) {
-			return;
+			return null;
 		}
 
 		$export = new \StartUp\Main_export();
@@ -153,11 +158,12 @@ class Container_identifier_8394837
 	public $export_id;
 	public $value = null;
 
-	public function __construct($id, $container_id) {
+	public function __construct($id, $container_id)
+	{
 		if (is_null(self::$main)) {
 			self::$main = getmypid();
 		}
-		$this->export_id = str_replace('.', '-', (string) microtime(true)).'_'.self::$main.'-'.$container_id.'-'.$id;
+		$this->export_id = str_replace('.', '-', (string) microtime(true)) . '_' . self::$main . '-' . $container_id . '-' . $id;
 		$this->value = $id;
 		$this->container_id = $container_id;
 	}
@@ -166,20 +172,18 @@ class Container_identifier_8394837
 class All_type extends Container
 {
 	protected $value = null;
-	private $id = null;
 	protected $simple = true;
 	protected $short = '-';
-	/**
-	 * @var Container_identifier_8394837
-	 */
+	private $id = null;
+	/* @var Container_identifier_8394837 */
 	protected $reference_to = null;
 
-	public function __construct( $id, $container_id)
+	public function __construct($id, $container_id)
 	{
 		$this->id = new \StartUp\Container_identifier_8394837($id, $container_id);
 	}
 
-	public function set_var($var)
+	public function set_var($var, $depth = null)
 	{
 		$this->value = $var;
 		return $this->id->value;
@@ -193,7 +197,8 @@ class All_type extends Container
 		return $this->id;
 	}
 
-	protected function get_container_id() {
+	protected function get_container_id()
+	{
 		return $this->id->container_id;
 	}
 
@@ -204,7 +209,7 @@ class All_type extends Container
 
 	public function create_html_value($before, $after)
 	{
-		$this->html_value = $before.$this->value.$after;
+		$this->html_value = $before . $this->value . $after;
 
 	}
 
@@ -213,7 +218,8 @@ class All_type extends Container
 		return $this->short;
 	}
 
-	public function construct_export() {
+	public function construct_export(Nesting $nesting = null)
+	{
 		return var_export($this->value, true);
 	}
 
@@ -223,7 +229,8 @@ class boolean_type extends All_type
 {
 	protected $short = 'bool';
 
-	public function construct_export() {
+	public function construct_export(Nesting $nesting = null)
+	{
 		return $this->value;
 	}
 }
@@ -232,7 +239,8 @@ class integer_type extends All_type
 {
 	protected $short = 'int';
 
-	public function construct_export() {
+	public function construct_export(Nesting $nesting = null)
+	{
 		return $this->value;
 	}
 }
@@ -241,7 +249,8 @@ class double_type extends All_type
 {
 	protected $short = 'float';
 
-	public function construct_export() {
+	public function construct_export(Nesting $nesting = null)
+	{
 		return $this->value;
 	}
 }
@@ -250,7 +259,8 @@ class string_type extends All_type
 {
 	protected $short = 'string';
 
-	public function construct_export() {
+	public function construct_export(Nesting $nesting = null)
+	{
 		return $this->value;
 	}
 }
@@ -259,7 +269,8 @@ class resource_type extends All_type
 {
 	protected $short = 'resource';
 
-	public function construct_export() {
+	public function construct_export(Nesting $nesting = null)
+	{
 		return '\Resource';
 	}
 
@@ -269,14 +280,15 @@ class NULL_type extends All_type
 {
 	protected $short = 'null';
 
-	public function construct_export() {
+	public function construct_export(Nesting $nesting = null)
+	{
 		return $this->value;
 	}
 }
 
 class unknown_type_type extends All_type
 {
-	protected $short = 'unkown';
+	protected $short = 'unknown';
 }
 
 class array_type extends All_type
@@ -294,8 +306,7 @@ class array_type extends All_type
 		}
 		$depth--;
 		$this->value = [];
-		foreach ($array as $key => $value)
-		{
+		foreach ($array as $key => $value) {
 			$key_object = $this->get_new_object($key, $depth);
 			$value_object = $this->get_new_object($value, $depth);
 			if ($key_object && $value_object) {
@@ -306,6 +317,11 @@ class array_type extends All_type
 	}
 
 
+	/**
+	 * @param Nesting|null $nesting
+	 * @return mixed|Array_export|Main_export|Reference|null
+	 * @throws \Exception
+	 */
 	public function construct_export(Nesting $nesting = null)
 	{
 		if (is_null($nesting)) {
@@ -342,6 +358,12 @@ class object_type extends All_type
 	private $export_reference;
 	private $object_hash;
 
+	/**
+	 * @param $object
+	 * @param null $depth
+	 * @return Container_identifier_8394837 | null
+	 * @throws \ReflectionException
+	 */
 	public function set_var($object, $depth = null) {
 		$object_token = $this->get_object_token($object);
 		// if this object is already processed, this object will act as a reference to that object
@@ -384,6 +406,11 @@ class object_type extends All_type
 		return $this->get_id()->value;
 	}
 
+	/**
+	 * @param Nesting|null $nesting
+	 * @return mixed|Circular_reference|Main_export|Object_export|Reference|null
+	 * @throws \Exception
+	 */
 	public function construct_export(Nesting $nesting = null)
 	{
 		if (is_null($nesting)) {
@@ -422,6 +449,12 @@ class object_type extends All_type
 		return $this->export_reference;
 	}
 
+	/**
+	 * @param \ReflectionClass $reflect
+	 * @param Object_export $export
+	 * @param Nesting $nesting
+	 * @throws \Exception
+	 */
 	private function process_reflection_class(\ReflectionClass $reflect, \StartUp\Object_export $export, $nesting)
 	{
 		$ancestor_reflect = $reflect->getParentClass();
@@ -476,6 +509,12 @@ class object_type extends All_type
 		$export->file = $reflect->getFileName();
 	}
 
+	/**
+	 * @param $value
+	 * @param Nesting $nesting
+	 * @return mixed|Main_export|null
+	 * @throws \Exception
+	 */
 	public function get_property_value_export($value, $nesting)
 	{
 		$prop_object = $this->get_new_object($value, $this->depth);
@@ -512,7 +551,6 @@ class object_type extends All_type
 				return $object->container_object_token;
 			}
 			return 1;
-
 		}
 	}
 
@@ -536,98 +574,115 @@ class object_type extends All_type
 	}
 }
 
-class Nesting {
+class Nesting
+{
     private $expecting_meeting = false;
     private $last_direction = false;
-
     private $pointers = [];
-
     private $current;
     private $last;
 
-    public function hello( $id ) {
-	$new = new Nesting_pointer;
-	$new->id = $id;
-	if ($this->expecting_meeting = 1) {
-	    $new->previous = $this->current;
-	    if ($this->current) {
-		$new->depth = $this->current->depth + 1;
-	    }
-	} elseif ($this->expecting_meeting = -1) {
-	    $new->next[] = $this->current;
-	}
-	if ($this->current) {
-	    $new->history = $this->current->history;
-	    $new->history[] = $this->current->id;
-	}
-	$new->last_direction = $this->expecting_meeting;
-	$this->last = $this->current;
-	$this->current = $new;
-	$this->pointers[$id] = $new;
-	$this->expecting_meeting = false;
-	return $this;
+    public function hello($id) {
+		$new = new Nesting_pointer;
+		$new->id = $id;
+		if ($this->expecting_meeting = 1) {
+			$new->previous = $this->current;
+			if ($this->current) {
+				$new->depth = $this->current->depth + 1;
+			}
+		} elseif ($this->expecting_meeting = -1) {
+			$new->next[] = $this->current;
+		}
+		if ($this->current) {
+			$new->history = $this->current->history;
+			$new->history[] = $this->current->id;
+		}
+		$new->last_direction = $this->expecting_meeting;
+		$this->last = $this->current;
+		$this->current = $new;
+		$this->pointers[$id] = $new;
+		$this->expecting_meeting = false;
+		return $this;
     }
 
-    public function meet_previous( $id ) {
-	if (! isset($this->pointers[$id])) {
-	    throw new \Exception(" $id not known in Nesting");
-	}
-	$this->current = $this->pointers[$id];
-	$this->expecting_meeting = -1;
-	return $this;
+	/**
+	 * @param $id
+	 * @return $this
+	 * @throws \Exception
+	 */
+    public function meet_previous($id)
+	{
+		if (!isset($this->pointers[$id])) {
+			throw new \Exception(" $id not known in Nesting");
+		}
+		$this->current = $this->pointers[$id];
+		$this->expecting_meeting = -1;
+		return $this;
     }
 
-    public function meet_next( $id ) {
-	if (! isset($this->pointers[$id])) {
-	    throw new \Exception(" $id not known in Nesting");
-	}
-	$this->current = $this->pointers[$id];
-	$this->expecting_meeting = 1;
-	return $this;
+	/**
+	 * @param $id
+	 * @return $this
+	 * @throws \Exception
+	 */
+    public function meet_next($id)
+	{
+		if (!isset($this->pointers[$id])) {
+			throw new \Exception(" $id not known in Nesting");
+		}
+		$this->current = $this->pointers[$id];
+		$this->expecting_meeting = 1;
+		return $this;
     }
 
-    public function is_circular( $id ) {
-	return in_array($id, $this->current->history);
-	//return $this->current->has_ancestor( $id ) || $this->current->has_descendant( $id );
+    public function is_circular($id)
+	{
+		return in_array($id, $this->current->history);
     }
 
-    public function get_ancestors($id_only = true) {
+    public function get_ancestors($id_only = true)
+	{
 	$ancestors = [];
-	$point = $this->current;
-	while ($point->previous) {
-	    if ($id_only) {
-		array_unshift($ancestors, $point->previous->id);
-	    } else {
-		array_unshift($ancestors, $point->previous);
-	    }
-	    $point = $point->previous;
+		$point = $this->current;
+		while ($point->previous) {
+			if ($id_only) {
+				array_unshift($ancestors, $point->previous->id);
+			} else {
+				array_unshift($ancestors, $point->previous);
+			}
+			$point = $point->previous;
+		}
+		return $ancestors;
 	}
-	return $ancestors;
-    }
 
-    public function get_depth() {
-	return $this->current->depth;
-    }
+	public function get_depth()
+	{
+		return $this->current->depth;
+	}
 }
 
-class Nesting_pointer {
+class Nesting_pointer
+{
     public $id;
-    public $previous;
+	/* @var $previous Nesting_pointer */
+	public $previous;
     public $next = [];
     public $last_direction;
     public $depth = 0;
     public $history = [];
 
-    public function has_ancestor($id) {
-	return $this->previous && ($this->previous->id === $id || $this->previous->has_ancestor($id));
+    public function has_ancestor($id)
+	{
+		return $this->previous && ($this->previous->id === $id || $this->previous->has_ancestor($id));
     }
 
-    public function has_descendant($id) {
-	foreach ($this->next as $child) {
-	    if ($child->id === $id || $child->has_descendant($id)) {
-		return true;
-	    }
+    public function has_descendant($id)
+	{
+		foreach ($this->next as $child) {
+			if ($child->id === $id || $child->has_descendant($id)) {
+				return true;
+			}
+		}
+		return false;
 	}
-	return false;
-    }
 }

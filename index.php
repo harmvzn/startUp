@@ -1,7 +1,6 @@
 <?php
 /**
- * This file is called in php.ini look in php.ini search for "auto_prepend_file"
- *
+ * This file is called in php.ini look in php.ini. Look for "auto_prepend_file"
  */
 $beforeInitHook = realpath(__DIR__.'/beforeInitHook.php');
 if ($beforeInitHook) {
