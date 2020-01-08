@@ -49,7 +49,8 @@ class start_up_ini
 	{
 		if (!is_dir(START_UP_FILES_PATH)) {
 			mkdir(START_UP_FILES_PATH);
-		    $exportFolder = START_UP_FILES_PATH . '/export';
+			chmod(START_UP_FILES_PATH, 0777);
+			$exportFolder = START_UP_FILES_PATH . '/export';
 			mkdir($exportFolder);
 		    $referencesFolder = $exportFolder . '/references';
 			mkdir($referencesFolder);
