@@ -8,7 +8,7 @@ services:
     networks:
       - startUp
     environment:
-      HARM_START_UP_BASE_PATH: /var/startUp
+      START_UP_BASE_PATH: /var/startUp
   startUpServer:
     image: nginx:alpine
     volumes:

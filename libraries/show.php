@@ -69,15 +69,14 @@ class Show
 	public function clean($string) {
 		return str_replace('\"', "'", $string);
 	}
-	}
 
 	/**
 	 * @param $dir
 	 */
 	private function affirmExportDir($dir)
 	{
-		if (!is_dir(HARM_START_UP_FILES_PATH)) {
-			mkdir(HARM_START_UP_FILES_PATH);
+		if (!is_dir(START_UP_FILES_PATH)) {
+			mkdir(START_UP_FILES_PATH);
 		}
 		if (!is_dir($dir)) {
 			mkdir($dir);
@@ -85,4 +84,5 @@ class Show
 		if (!is_dir($dir . $this->ref_suffix)) {
 			mkdir($dir . $this->ref_suffix);
 		}
+	}
 }
