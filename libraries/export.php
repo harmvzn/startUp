@@ -1,5 +1,5 @@
 <?php
-namespace Harm;
+namespace StartUp;
 
 class Export {
 	public $type;

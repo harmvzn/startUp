@@ -1,13 +1,13 @@
 <?php
 
-namespace Harm;
+namespace StartUp;
 
 class Debug_controller
 {
-	/** @var \Harm\Show */
+	/** @var \StartUp\Show */
 	private $show = null;
 	private $output_type = 'html';
-	private $output_depth = 3;
+	private $output_depth = OUTPUT_DEPTH;
 	private $output_buffer;
 	private $max_string_length = 100;
 	private static $backlog = array();
@@ -27,17 +27,17 @@ class Debug_controller
 
 	public function show($to_be_shown, $tags = array())
 	{
-		require_once HARM_START_UP_BASE_PATH . '/libraries/Show.php';
+		require_once START_UP_BASE_PATH . '/libraries/show.php';
 
 		if (!$this->show) {
-			$this->show = new \Harm\Show();
+			$this->show = new \StartUp\Show();
 			$this->show->output_type = $this->output_type;
 			$this->show->max_depth = $this->output_depth;
 			$this->show->max_string_length = $this->max_string_length;
 		}
 
-		if (file_exists(HARM_START_UP_FILES_PATH . '/record') && file_get_contents(HARM_START_UP_FILES_PATH . '/record') === 'ON') {
-			$this->show->prepaire($to_be_shown, $tags);
+		if (file_exists(START_UP_FILES_PATH . '/record') && file_get_contents(START_UP_FILES_PATH . '/record') === 'ON') {
+			$this->show->prepare($to_be_shown, $tags);
 		}
 
 		return $this;
@@ -120,7 +120,8 @@ class Debug_controller
 		}
 	}
 
-	public function verb($incl_backtrace = false) {
+	public function verb($incl_backtrace = false)
+	{
 		$back_log = debug_backtrace(true, $incl_backtrace ? 0 : 2);
 		if (isset($back_log[1])) {
 			$class = !empty($back_log[1]['class']) ? $back_log[1]['class'] : null;
@@ -134,10 +135,10 @@ class Debug_controller
 						$method = $reflection->getMethod($function);
 						$meth_args = $method->getParameters();
 						foreach ($back_log[1]['args'] as $i => $arg) {
-							$key = isset($meth_args[$i]) ? $meth_args[$i]->getName() : 'unkown' + $i;
+							$key = isset($meth_args[$i]) ? $meth_args[$i]->getName() : 'unknown' . $i;
 							$args[$key] = $arg;
 						}
-					} catch (ReflectionException $ex) {
+					} catch (\Exception $ex) {
 
 					}
 				}
@@ -166,10 +167,8 @@ class Debug_controller
 	 * INFECT
 	 * , true);
 	 *
-	 *
-	 * @param type $class_declaration
-	 * @param type $inclusive_backtrace
-	 * @return type
+	 * @param All_type $class_declaration
+	 * @param All_type $inclusive_backtrace
 	 */
 	public function infect_class($class_declaration, $inclusive_backtrace = false)
 	{		
@@ -182,9 +181,6 @@ class Debug_controller
 			eval($class_declaration);
 			return;
 		}
-		/**
-		 * decifer class
-		 */
 		$is_abstract = trim($classes[1]) === 'abstract';
 
 		$class_name = $classes[2];
@@ -200,7 +196,7 @@ class Debug_controller
 		$function_names = [];
 		if (!preg_match_all('/\s*([\w\s\&]*?)function(\s+\w*\s*)\(([^\{]*)/i', $class_declaration, $function_names)) {
 			eval($class_declaration);
-			return; // nothing to do
+			return;
 		}
 
 		$infection_class_abstract = $is_abstract ? 'abstract' : '';
@@ -269,7 +265,6 @@ class Debug_controller
 
 				$class_declaration = preg_replace('/function\s+'.trim($function['old_name']).'/', 'function '.$new_name, $class_declaration);
 			}
-
 		}
 
 		$infection_declaration .= '}';
@@ -282,14 +277,11 @@ class Debug_controller
 		}
 		$class_declaration_infected = preg_replace('/class\s+'.$class_name.'[^{]*/', 'class '.$class_name.' extends '.$infection_class_name, $class_declaration_no_private);
 
-		$use_declarations = [];
-		if (preg_match('/\s* use ([\w\s\\\_]+);/', $class_declaration_infected, $use_declarations)) {
-			
-		}
 		eval($class_declaration_infected);
 	}
 
-	private function create_function_call($function_name, $param_string, $static_so_class_name = null) {
+	private function create_function_call($function_name, $param_string, $static_so_class_name = null)
+	{
 		if ($static_so_class_name) {
 			return "forward_static_call_array(['$static_so_class_name', '$function_name'], $param_string);";
 		} else {
@@ -297,7 +289,8 @@ class Debug_controller
 		}
 	}
 
-	private function extract_params($string) {
+	private function extract_params($string)
+	{
 		$string_without_brace = trim($string, '()');
 		$explode = explode(',', $string_without_brace);
 		foreach ($explode as $i => $param) {
@@ -306,7 +299,8 @@ class Debug_controller
 		return $explode;
 	}
 
-	private function remove_base_comments($string) {
+	private function remove_base_comments($string)
+	{
 		$string = preg_replace('/\n\s*\/\/[^\n]*/', "\n", $string);
 		$string = preg_replace('/\/\*[^*(?=\/)]*\//', "\n", $string);
 		return $string;
