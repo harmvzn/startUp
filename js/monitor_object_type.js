@@ -1,8 +1,3 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 function register_and_install_object() {
     this.parse = function(object) {
         var object_html = $('<div class="object">');
@@ -22,11 +17,10 @@ function register_and_install_object() {
             }
         } else {
             if (object.id) {
-                    // object can be loaded when clicking on it
-                    var new_button = $('<button data-id="' + object.id + '">').html('laad').on('click load_data', loadfromfile);
-                    return $('<div>').append(new_button);
+                var hide_show_button = $('<button data-id="' + object.id + '">').html('toon details').on('click load_data', hide_show_data);
+                var loaded_data_div = $('<div id="' + object.id + '">');
+                return $('<div>').append(hide_show_button).append(loaded_data_div);
             }
-            // else its an unkown
             for (var key in object) {
                     properties.append($('<dt>').append(parse_simple_from_result(key)))
                                     .append($('<dd>').append(parse_content_from_result(object[key])));
@@ -34,7 +28,7 @@ function register_and_install_object() {
         }
         object_html.append(properties);
         return object_html;
-    }
+    };
     
     function add_property_to_dl(dl, field, value, all) {
         if (field === 'file' && typeof value === 'string' && value.indexOf('/') !== -1) {
@@ -44,7 +38,6 @@ function register_and_install_object() {
         }
         dl.append($('<dt>').append(parse_content_from_result(field)))
                         .append($('<dd>').append(value_html));
-        
     }
     
     function get_file_link(file, all) {
@@ -60,31 +53,37 @@ function register_and_install_object() {
             class : "open_netbeans_link"
         }).html(parse_content_from_result(file));
     }
-    
-    var loadedfiles = {};
-    function loadfromfile( ev ) {
-            var button = $(ev.target);
-            var id = button.data('id');
-            if (loadedfiles[id]) {
-                    loadfilesuccess(loadedfiles[id]);
-                    return;
-            }
-            $.get('/api.php/reference/' +  id, '', function (response) {
-                    if ( ! response.data || ! response.data.id) {
-                            button.html('mislukt');
-                            return;
-                    }
 
+    function hide_show_data(ev) {
+        var button = $(ev.target);
+        var id = button.data('id');
+        var show = button.html() === 'toon details';
+        var loaded_data_div = $('#' + id);
+        if (show) {
+            if (loaded_data_div[0].innerHTML !== '') {
+                loaded_data_div.show();
+            } else {
+                $.get('/api.php/reference/' + id, '', function (response) {
+                    if (!response.data || !response.data.id) {
+                        button.html('mislukt');
+                        return;
+                    }
                     var content = parse_content_from_result(response.data);
-                    button.replaceWith(content);
+                    loaded_data_div.html(content);
                     var maxwidth = 0;
-                    content.find('dt').each(function(i, item){
-                            var width = $(item).width();
-                            if (width > maxwidth) {
-                                    maxwidth = width;
-                            }
+                    content.find('dt').each(function (i, item) {
+                        var width = $(item).width();
+                        if (width > maxwidth) {
+                            maxwidth = width;
+                        }
                     }).width(maxwidth);
-            }, 'json');
+                }, 'json');
+            }
+            button.html('verberg details');
+        } else {
+            loaded_data_div.hide();
+            button.html('toon details');
+        }
     }
 }
 

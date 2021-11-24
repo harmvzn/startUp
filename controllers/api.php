@@ -1,6 +1,6 @@
 <?php
 
-namespace Harm;
+namespace StartUp;
 
 class Api
 {
@@ -23,17 +23,17 @@ class Api
 
 	public function record()
 	{
-		file_put_contents(HARM_START_UP_FILES_PATH . '/record', 'ON');
+		file_put_contents(START_UP_FILES_PATH . '/record', 'ON');
 	}
 
 	public function stop()
 	{
-		file_put_contents(HARM_START_UP_FILES_PATH . '/record', 'OFF');
+		file_put_contents(START_UP_FILES_PATH . '/record', 'OFF');
 	}
 
 	public function get_latest()
 	{
-		$dir = realpath(HARM_START_UP_FILES_PATH . '/export/');
+		$dir = realpath(START_UP_FILES_PATH . '/export/');
 
 		if ( ! $dir || ! is_dir($dir) ) {
 			return;
@@ -66,7 +66,7 @@ class Api
 	}
 
 	public function reference( $id ) {
-		$file = realpath(HARM_START_UP_FILES_PATH . '/export/references/'.$id);
+		$file = realpath(START_UP_FILES_PATH . '/export/references/'.$id);
 		if (file_exists($file)) {
 			echo '{"data":';
 			echo file_get_contents($file);
@@ -78,10 +78,10 @@ class Api
 
 	public function get_latest_old()
 	{
-		if (file_exists(HARM_START_UP_FILES_PATH . '/recorded')) {
-			$file = fopen(HARM_START_UP_FILES_PATH . '/recorded', 'r+');
-			if (flock($file, LOCK_EX) && filesize(HARM_START_UP_FILES_PATH . '/recorded')) {
-				echo fread($file, filesize(HARM_START_UP_FILES_PATH . '/recorded'));
+		if (file_exists(START_UP_FILES_PATH . '/recorded')) {
+			$file = fopen(START_UP_FILES_PATH . '/recorded', 'r+');
+			if (flock($file, LOCK_EX) && filesize(START_UP_FILES_PATH . '/recorded')) {
+				echo fread($file, filesize(START_UP_FILES_PATH . '/recorded'));
 				ftruncate($file, 0);
 				flock($file, LOCK_UN);
 			}
@@ -91,7 +91,7 @@ class Api
 
 	public function delete_all()
 	{
-		$dir = realpath(HARM_START_UP_FILES_PATH . '/export');
+		$dir = realpath(START_UP_FILES_PATH . '/export');
 
 		if ( ! $dir || ! is_dir($dir) ) {
 			return;
@@ -102,7 +102,7 @@ class Api
 
 	private function delete_old()
 	{
-		$dir = realpath(HARM_START_UP_FILES_PATH . '/export/references');
+		$dir = realpath(START_UP_FILES_PATH . '/export/references');
 
 		if ( ! $dir || ! is_dir($dir) ) {
 			return;

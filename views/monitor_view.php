@@ -148,7 +148,7 @@
 							add = 1;
 							pairs.push({
 								metaData : {
-									pid : 'unkown',
+									pid : 'unknown',
                                     index : 0,
                                 },
 								data : result_array[ra]
@@ -249,7 +249,7 @@
 					} else if (typeof simple === "boolean") {
 						return $('<div class="boolean">').append($('<div class="content">').text(simple ? 'true' : 'false'));
 					} else {
-						return $('<div class="unkown">').append($('<div class="content">').text(simple.toString()));
+						return $('<div class="unknown">').append($('<div class="content">').text(simple.toString()));
 					}
 				}
 				window.parse_simple_from_result = parse_simple_from_result;

@@ -1,44 +1,44 @@
 <?php
 
-namespace Harm;
+namespace StartUp;
 
-require_once HARM_START_UP_BASE_PATH . '/libraries/Container.php';
+require_once START_UP_BASE_PATH . '/libraries/container.php';
 
 class Show
 {
 	private static $counter = 0;
-	private $prepaired = array();
+	private $prepared = [];
 	public $output_type = 'html';
 	public $max_depth = 3;
 	public $max_string_length = 100;
 	public $ref_suffix = 'references/';
 
-	private $stored_objects = array();
+	private $stored_objects = [];
 
 
-	public function get_prepaired()
+	public function get_prepared()
 	{
 		return 'deprecated';
 	}
 
 	public function clear()
 	{
-		$this->prepaired = array();
+		$this->prepared = array();
 		$this->stored_objects = array();
 	}
 
 
-	public function prepaire($to_be_shown, $tags = array(), $first = true)
+	public function prepare($to_be_shown, $tags = [])
 	{
-		$container = new \Harm\Container($this->max_depth);
+		$container = new \StartUp\Container($this->max_depth);
 		$container->set_var($to_be_shown);
 		$output = $container->construct_export();
 
-		if ( ! $output) {
-			return '';
+		if (!$output) {
+			return;
 		}
 
-		$dir = HARM_START_UP_FILES_PATH . '/export/';
+		$dir = START_UP_FILES_PATH . '/export/';
 
 		$this->affirmExportDir($dir);
 
@@ -47,9 +47,10 @@ class Show
 		file_put_contents($dir.$main_outputs_id, $this->clean($label.json_encode($output->main_object->construct_export())));
 
 		foreach ($output->reference_objects as $reference_object) {
-			file_put_contents($dir.$this->ref_suffix.$reference_object->id, $this->clean(json_encode($reference_object)));
+			/* @var $reference_object Object_export */
+			file_put_contents($dir.$this->ref_suffix . strval($reference_object->id), $this->clean(json_encode($reference_object)));
 		}
-		return '';
+		return;
 	}
 
 	public function get_label_prefix( $tags ) {
@@ -68,10 +69,6 @@ class Show
 	public function clean($string) {
 		return str_replace('\"', "'", $string);
 	}
-
-	public function export()
-	{
-		echo 'deprecated';
 	}
 
 	/**
@@ -88,6 +85,4 @@ class Show
 		if (!is_dir($dir . $this->ref_suffix)) {
 			mkdir($dir . $this->ref_suffix);
 		}
-	}
-
 }

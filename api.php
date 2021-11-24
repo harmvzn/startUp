@@ -1,16 +1,17 @@
 <?php
 
-if (!defined('HARM_START_UP_BASE_PATH')) {
-	define('HARM_START_UP_BASE_PATH', __DIR__);
+if (!defined('START_UP_BASE_PATH')) {
+	define('START_UP_BASE_PATH', __DIR__);
 }
 
-if (!defined('HARM_START_UP_FILES_PATH')) {
-	define('HARM_START_UP_FILES_PATH', __DIR__ . '/files');
+if (!defined('START_UP_FILES_PATH')) {
+	define('START_UP_FILES_PATH', __DIR__ . '/files');
 }
 
-require_once HARM_START_UP_BASE_PATH . '/controllers/api.php';
+require_once START_UP_BASE_PATH . '/controllers/api.php';
 
-$api = new \Harm\Api();
+
+$api = new \StartUp\Api();
 $uri = isset($_SERVER['REQUEST_URI']) ? explode('/', trim($_SERVER['REQUEST_URI'], '/')) : null;
 
 if (is_null($uri) && isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
