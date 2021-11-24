@@ -52,8 +52,10 @@ class start_up_ini
 			chmod(START_UP_FILES_PATH, 0777);
 			$exportFolder = START_UP_FILES_PATH . '/export';
 			mkdir($exportFolder);
+			chmod($exportFolder, 0777);
 		    $referencesFolder = $exportFolder . '/references';
 			mkdir($referencesFolder);
+			chmod($referencesFolder, 0777);
 		}
 	}
 

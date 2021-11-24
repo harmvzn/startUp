@@ -546,11 +546,15 @@ class object_type extends All_type
 			if (isset($object->container_object_token)) {
 				return $object->container_object_token;
 			}
-			$object->container_object_token = uniqid();
+			try {
+				$object->container_object_token = uniqid();
+			} catch (\TypeError $e) {
+				return uniqid();
+			}
 			if (isset($object->container_object_token)) {
 				return $object->container_object_token;
 			}
-			return 1;
+			return uniqid();
 		}
 	}
 
