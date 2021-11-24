@@ -352,6 +352,23 @@ class object_type extends All_type
 			return $this->get_id()->value;
 		}
 
+		$class = get_class($object);
+
+		$ignoredClasses = [
+			'/^Doctrine.*$/',
+			'/^GuzzleHttp.*$/'
+		];
+
+		foreach($ignoredClasses as $ignoredClass) {
+			if (preg_match($ignoredClass, $class)) {
+				$object = new \stdClass();
+				$object->class = $class;
+				$object->ignoredClasses = $ignoredClasses;
+				$object->description = 'StartUp ignored this class';
+				break;
+			}
+		}
+
 		$this->object_hash = spl_object_hash($object);
 
 		if ($depth === null) {

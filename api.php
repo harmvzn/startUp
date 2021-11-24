@@ -1,5 +1,13 @@
 <?php
 
+if (!defined('HARM_START_UP_BASE_PATH')) {
+	define('HARM_START_UP_BASE_PATH', __DIR__);
+}
+
+if (!defined('HARM_START_UP_FILES_PATH')) {
+	define('HARM_START_UP_FILES_PATH', __DIR__ . '/files');
+}
+
 require_once HARM_START_UP_BASE_PATH . '/controllers/api.php';
 
 $api = new \Harm\Api();

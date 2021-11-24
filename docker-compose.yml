@@ -1,0 +1,25 @@
+---
+version: '2.4'
+services:
+  startUp:
+    image: php:fpm-alpine
+    volumes:
+      - ./:/var/startUp
+    networks:
+      - startUp
+    environment:
+      HARM_START_UP_BASE_PATH: /var/startUp
+  startUpServer:
+    image: nginx:alpine
+    volumes:
+      - ./:/var/startUp
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      startUp:
+    ports:
+      - 4999:80
+    depends_on:
+      - startUp
+
+networks:
+  startUp:

@@ -96,15 +96,7 @@ class Api
 		if ( ! $dir || ! is_dir($dir) ) {
 			return;
 		}
-                $command = "cd $dir; rm ./*;";
-                `$command`;
-                
-		$dir = realpath(HARM_START_UP_FILES_PATH . '/export/references');
-
-		if ( ! $dir || ! is_dir($dir) ) {
-			return;
-		}
-                $command = "cd $dir; rm ./*;";
+                $command = "rm -rf $dir;";
                 `$command`;
 	}
 

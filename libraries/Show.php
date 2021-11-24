@@ -40,6 +40,8 @@ class Show
 
 		$dir = HARM_START_UP_FILES_PATH . '/export/';
 
+		$this->affirmExportDir($dir);
+
 		$label = $this->get_label_prefix($tags);
 		$main_outputs_id = $output->main_object->get_id()->export_id;
 		file_put_contents($dir.$main_outputs_id, $this->clean($label.json_encode($output->main_object->construct_export())));
@@ -56,7 +58,11 @@ class Show
 		}
 		array_unshift($tags, gethostname());
 		$number = self::$counter++;
-		return '{ "tags" : '.json_encode((array) $tags).', "index" : '.$number.', "pid" : "'.getmypid().'"},';
+		$encoded_tags = json_encode((array) $tags);
+		if (!trim((string) $encoded_tags)) {
+			$encoded_tags = json_encode([var_export($tags, true)]);
+		}
+		return '{ "tags" : '. $encoded_tags .', "index" : '.$number.', "pid" : "'.getmypid().'"},';
 	}
 
 	public function clean($string) {
@@ -66,6 +72,22 @@ class Show
 	public function export()
 	{
 		echo 'deprecated';
+	}
+
+	/**
+	 * @param $dir
+	 */
+	private function affirmExportDir($dir)
+	{
+		if (!is_dir(HARM_START_UP_FILES_PATH)) {
+			mkdir(HARM_START_UP_FILES_PATH);
+		}
+		if (!is_dir($dir)) {
+			mkdir($dir);
+		}
+		if (!is_dir($dir . $this->ref_suffix)) {
+			mkdir($dir . $this->ref_suffix);
+		}
 	}
 
 }
