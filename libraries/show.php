@@ -28,7 +28,12 @@ class Show
 	}
 
 
-	public function prepare($to_be_shown, $tags = [])
+	/**
+	 * @param $to_be_shown
+	 * @param array $tags
+	 * @param $output_type
+	 */
+	public function prepare($to_be_shown, $tags = [], $output_type)
 	{
 		$container = new \StartUp\Container($this->max_depth);
 		$container->set_var($to_be_shown);
@@ -42,9 +47,23 @@ class Show
 
 		$this->affirmExportDir($dir);
 
-		$label = $this->get_label_prefix($tags);
+		$label = $this->get_label_prefix($tags, $output_type);
 		$main_outputs_id = $output->main_object->get_id()->export_id;
-		file_put_contents($dir.$main_outputs_id, $this->clean($label.json_encode($output->main_object->construct_export())));
+
+		$valid_json = null;
+		if ($output_type === 'json') {
+			try {
+				json_decode($output->main_object->construct_export());
+				$valid_json = $output->main_object->construct_export();
+			} catch (\Exception $e) {
+				// fail
+			}
+		}
+		if (!$valid_json) {
+			$valid_json = json_encode($output->main_object->construct_export());
+		}
+
+		file_put_contents($dir.$main_outputs_id, $this->clean($label.$valid_json));
 
 		foreach ($output->reference_objects as $reference_object) {
 			/* @var $reference_object Object_export */
@@ -53,7 +72,7 @@ class Show
 		return;
 	}
 
-	public function get_label_prefix( $tags ) {
+	public function get_label_prefix( $tags , $output_type) {
 		if (! is_array($tags)) {
 			$tags = [$tags];
 		}
@@ -63,7 +82,7 @@ class Show
 		if (!trim((string) $encoded_tags)) {
 			$encoded_tags = json_encode([var_export($tags, true)]);
 		}
-		return '{ "tags" : '. $encoded_tags .', "index" : '.$number.', "pid" : "'.getmypid().'"},';
+		return '{ "tags" : '. $encoded_tags .', "index" : '.$number.', "pid" : "'.getmypid().'", "type" : "' . $output_type . '"},';
 	}
 
 	public function clean($string) {

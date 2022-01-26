@@ -161,7 +161,7 @@
 
 					pairs.forEach(function(pair) {
 						var tag = parse_tag_from_result(pair.metaData.tags);
-						var content = parse_content_from_result(pair.data, tag);
+						var content = parse_content_from_result(pair.data, tag, pair.metaData.type);
 						var pidColor = getPidColor(pair.metaData.pid);
 						var span = $('<div data-pid="'+pair.metaData.pid+'">').css({
                             'border-left' : '5px solid rgb(' + pidColor.join(', ') + ')',
@@ -185,14 +185,23 @@
                     return pidColorCache[pid];
                 }
 
-				function parse_content_from_result(content, tag) {
+				function parse_content_from_result(content, tag, type) {
 					var content_html;
+					if (content instanceof Object && type === 'json') {
+						content = JSON.stringify(content);
+					}
 					if (content instanceof Array) {
 						content_html = parse_array_from_result(content);
 					} else if (content instanceof Object) {
 						content_html = parse_object_from_result(content);
 					} else {
-						content_html = parse_simple_from_result(content);
+						if (type === 'xml') {
+							content_html = parse_xml_from_result(content);
+						} else if (type === 'json') {
+							content_html = parse_json_from_result(content);
+						} else {
+							content_html = parse_simple_from_result(content);
+						}
 					}
 					if (tag) {
 						content_html.prepend(tag);
@@ -253,6 +262,29 @@
 					}
 				}
 				window.parse_simple_from_result = parse_simple_from_result;
+
+				function parse_xml_from_result(xml) {
+					const button = $('<button type="button">').text('laad xml');
+					button.on('click', function() {
+                        const json_clean = xml.replaceAll('\\n', '').replaceAll('\\/', '/');
+						const blob = new Blob([json_clean], {type : 'text/xml'});
+						const url = URL.createObjectURL(blob);
+						window.open(url, '_blank').focus();
+					});
+					const parent = $('<div class="xml">');
+					return parent.append(button);
+				}
+
+				function parse_json_from_result(json) {
+					const button = $('<button type="button">').text('laad json');
+					button.on('click', function() {
+						const blob = new Blob([json], {type : 'application/json'});
+						const url = URL.createObjectURL(blob);
+						window.open(url, '_blank').focus();
+					});
+					const parent = $('<div class="json">');
+					return parent.append(button);
+				}
 
 				//function replace_new_lines
 

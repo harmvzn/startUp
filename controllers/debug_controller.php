@@ -6,7 +6,6 @@ class Debug_controller
 {
 	/** @var \StartUp\Show */
 	private $show = null;
-	private $output_type = 'html';
 	private $output_depth = OUTPUT_DEPTH;
 	private $output_buffer;
 	private $max_string_length = 100;
@@ -27,28 +26,20 @@ class Debug_controller
 
 	public function show($to_be_shown, $tags = array())
 	{
-		require_once START_UP_BASE_PATH . '/libraries/show.php';
-
-		if (!$this->show) {
-			$this->show = new \StartUp\Show();
-			$this->show->output_type = $this->output_type;
-			$this->show->max_depth = $this->output_depth;
-			$this->show->max_string_length = $this->max_string_length;
-		}
-
-		if (file_exists(START_UP_FILES_PATH . '/record') && file_get_contents(START_UP_FILES_PATH . '/record') === 'ON') {
-			$this->show->prepare($to_be_shown, $tags);
-		}
+		$this->create_export($to_be_shown, $tags, 'html');
 
 		return $this;
 	}
 
-	public function set_output_type($arg)
+	public function xml($to_be_shown, $tags = [])
 	{
-		$this->output_type = $arg;
-		if ($this->show) {
-			$this->show->output_type = $this->output_type;
-		}
+		$this->create_export($to_be_shown, $tags, 'xml');
+		return $this;
+	}
+
+	public function json($to_be_shown, $tags = [])
+	{
+		$this->create_export($to_be_shown, $tags, 'json');
 		return $this;
 	}
 
@@ -306,6 +297,25 @@ class Debug_controller
 		return $string;
 	}
 
+	/**
+	 * @param $to_be_shown
+	 * @param $tags
+	 * @param $output_type
+	 */
+	private function create_export($to_be_shown, $tags, $output_type)
+	{
+		require_once START_UP_BASE_PATH . '/libraries/show.php';
+
+		if (!$this->show) {
+			$this->show = new \StartUp\Show();
+			$this->show->max_depth = $this->output_depth;
+			$this->show->max_string_length = $this->max_string_length;
+		}
+
+		if (file_exists(START_UP_FILES_PATH . '/record') && file_get_contents(START_UP_FILES_PATH . '/record') === 'ON') {
+			$this->show->prepare($to_be_shown, $tags, $output_type);
+		}
+	}
 
 
 }
