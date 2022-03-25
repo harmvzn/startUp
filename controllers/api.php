@@ -21,6 +21,14 @@ class Api
             }
 	}
 
+	public function save_debug_content($reference)
+	{
+		if (!empty($_POST['file'])) {
+			$contents = file_get_contents($_POST['file']['tmp_name']);
+			(new Debug_content_cache(true))->save($_POST['file']['name'], $contents, (bool) $reference);
+		}
+	}
+
 	public function record()
 	{
 		file_put_contents(START_UP_FILES_PATH . '/record', 'ON');
@@ -91,13 +99,7 @@ class Api
 
 	public function delete_all()
 	{
-		$dir = realpath(START_UP_FILES_PATH . '/export');
-
-		if ( ! $dir || ! is_dir($dir) ) {
-			return;
-		}
-                $command = "rm -rf $dir;";
-                `$command`;
+		(new Debug_content_cache(true))->delete_all();
 	}
 
 	private function delete_old()

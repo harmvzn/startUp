@@ -11,22 +11,18 @@ class Show
 	public $output_type = 'html';
 	public $max_depth = 3;
 	public $max_string_length = 100;
-	public $ref_suffix = 'references/';
+
 
 	private $stored_objects = [];
+	/**
+	 * @var Debug_content_cache
+	 */
+	private $cache;
 
-
-	public function get_prepared()
+	public function __construct(bool $master)
 	{
-		return 'deprecated';
+		$this->cache = new Debug_content_cache($master);
 	}
-
-	public function clear()
-	{
-		$this->prepared = array();
-		$this->stored_objects = array();
-	}
-
 
 	/**
 	 * @param $to_be_shown
@@ -42,10 +38,6 @@ class Show
 		if (!$output) {
 			return;
 		}
-
-		$dir = START_UP_FILES_PATH . '/export/';
-
-		$this->affirmExportDir($dir);
 
 		$label = $this->get_label_prefix($tags, $output_type);
 		$main_outputs_id = $output->main_object->get_id()->export_id;
@@ -63,13 +55,12 @@ class Show
 			$valid_json = json_encode($output->main_object->construct_export());
 		}
 
-		file_put_contents($dir.$main_outputs_id, $this->clean($label.$valid_json));
+		$this->cache->save($main_outputs_id, $this->clean($label.$valid_json));
 
 		foreach ($output->reference_objects as $reference_object) {
 			/* @var $reference_object Object_export */
-			file_put_contents($dir.$this->ref_suffix . strval($reference_object->id), $this->clean(json_encode($reference_object)));
+			$this->cache->save(strval($reference_object->id), $this->clean(json_encode($reference_object)), true);
 		}
-		return;
 	}
 
 	public function get_label_prefix( $tags , $output_type) {
@@ -89,19 +80,4 @@ class Show
 		return str_replace('\"', "'", $string);
 	}
 
-	/**
-	 * @param $dir
-	 */
-	private function affirmExportDir($dir)
-	{
-		if (!is_dir(START_UP_FILES_PATH)) {
-			mkdir(START_UP_FILES_PATH);
-		}
-		if (!is_dir($dir)) {
-			mkdir($dir);
-		}
-		if (!is_dir($dir . $this->ref_suffix)) {
-			mkdir($dir . $this->ref_suffix);
-		}
-	}
 }

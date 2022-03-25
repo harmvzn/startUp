@@ -10,6 +10,12 @@ class Debug_controller
 	private $output_buffer;
 	private $max_string_length = 100;
 	private static $backlog = array();
+	private $master;
+
+	public function __construct() {
+		$this->master = $this->getIAmMaster();
+	}
+
 	/**
 	 *
 	 * @param mixed $string
@@ -307,7 +313,7 @@ class Debug_controller
 		require_once START_UP_BASE_PATH . '/libraries/show.php';
 
 		if (!$this->show) {
-			$this->show = new \StartUp\Show();
+			$this->show = new \StartUp\Show($this->master);
 			$this->show->max_depth = $this->output_depth;
 			$this->show->max_string_length = $this->max_string_length;
 		}
@@ -317,6 +323,15 @@ class Debug_controller
 		}
 	}
 
+	private function getIAmMaster()
+	{
+		$check_name_space = `ping -w 3 startUp`;
+		$matches = [];
+		if (preg_match('/^\s*?PING startUp \((?<my_ip>[\d.]+)\):.*?bytes from (?<startUp_ip>[\d.]+): seq=0/', $check_name_space, $matches)) {
+			return empty($matches['my_ip']) || empty($matches['startUp_ip']) ||  $matches['my_ip'] === $matches['startUp_ip'];
+		}
+		return true;
+	}
 
 }
 
