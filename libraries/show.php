@@ -96,12 +96,15 @@ class Show
 	{
 		if (!is_dir(START_UP_FILES_PATH)) {
 			mkdir(START_UP_FILES_PATH);
+			chmod(START_UP_FILES_PATH, 0777);
 		}
 		if (!is_dir($dir)) {
 			mkdir($dir);
+			chmod($dir, 0777);
 		}
 		if (!is_dir($dir . $this->ref_suffix)) {
 			mkdir($dir . $this->ref_suffix);
+			chmod($dir . $this->ref_suffix, 0777);
 		}
 	}
 }
