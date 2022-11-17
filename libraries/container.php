@@ -365,13 +365,16 @@ class object_type extends All_type
 	 * @throws \ReflectionException
 	 */
 	public function set_var($object, $depth = null) {
+		$class = get_class($object);
+		if (substr($class, 0, 7) === 'StartUp') {
+			return $this->get_id()->value;
+		}
+
 		$object_token = $this->get_object_token($object);
 		// if this object is already processed, this object will act as a reference to that object
 		if ($this->reference_to = $this->get_object_allready_processed_reference($object, $object_token)) {
 			return $this->get_id()->value;
 		}
-
-		$class = get_class($object);
 
 		$ignoredClasses = [
 			'/^Doctrine.*$/',
@@ -399,7 +402,8 @@ class object_type extends All_type
 		}
 		$depth--;
 		$this->depth = $depth;
-		if ($object instanceof \ReflectionClass) {
+
+		if ($object instanceof \ReflectionClass && property_exists($object, '_origin_object')) {
 			$this->reflection = $object;
 			$this->value = $object->_origin_object;
 		} else {
@@ -516,7 +520,11 @@ class object_type extends All_type
 				$prop_export->field = $prop->getName();
 				$error_reporting = ini_get('error_reporting');
 				error_reporting(0);
-				$prop_export->value = $this->get_property_value_export($prop->getValue($this->value), $nesting);
+				$value_by_reflection = null;
+				if (!method_exists($prop, 'isInitialized') || $prop->isInitialized($this->value)) {
+					$value_by_reflection = $prop->getValue($this->value);
+				}
+				$prop_export->value = $this->get_property_value_export($value_by_reflection, $nesting);
 				error_reporting($error_reporting);
 				$export->properties[] = $prop_export;
 			}
