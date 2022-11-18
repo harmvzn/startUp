@@ -415,7 +415,7 @@ class object_type extends All_type
 							try {
 								$this->value = clone $object;								
 							} catch (\Exception $ex) {
-								std()->show($ex, 'Container Object_type::set_var');
+								std()->show($ex, 'StartUp Warning: Container Object_type::set_var');
 								$this->value = $object;
 							}
                         } else {
