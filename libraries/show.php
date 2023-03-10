@@ -33,8 +33,11 @@ class Show
 	 * @param array $tags
 	 * @param $output_type
 	 */
-	public function prepare($to_be_shown, $tags = [], $output_type)
+	public function prepare($to_be_shown, $tags, $output_type)
 	{
+        if (!isset($tags)) {
+            $tags = [];
+        }
 		$container = new \StartUp\Container($this->max_depth);
 		$container->set_var($to_be_shown);
 		$output = $container->construct_export();
