@@ -415,7 +415,13 @@ class object_type extends All_type
 							try {
 								$this->value = clone $object;								
 							} catch (\Exception $ex) {
-								std()->show($ex, 'StartUp Warning: Container Object_type::set_var');
+								std()->show([
+									'exceptionMessage' => $ex->getMessage(),
+									'file' => $ex->getFile(),
+									'line' => $ex->getLine(),
+									'backtrace' => $ex->getTraceAsString(),
+									'class' => get_class($object),
+								], 'StartUp Warning: Container Object_type::set_var');
 								$this->value = $object;
 							}
                         } else {
@@ -564,7 +570,7 @@ class object_type extends All_type
 			}
 			$object->container_object_token = uniqid();
 			return $object->container_object_token;
-	    } catch (\Exception $ex) {
+	    } catch (\Throwable $ex) {
 			if ($object instanceof \Closure) {
 				return uniqid();
 			}
@@ -573,7 +579,7 @@ class object_type extends All_type
 			}
 			try {
 				$object->container_object_token = uniqid();
-			} catch (\TypeError $e) {
+			} catch (\Throwable $e) {
 				return uniqid();
 			}
 			if (isset($object->container_object_token)) {
