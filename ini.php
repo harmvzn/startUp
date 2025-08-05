@@ -50,13 +50,17 @@ class start_up_ini
 		if (!is_dir(START_UP_FILES_PATH)) {
 			mkdir(START_UP_FILES_PATH);
 			chmod(START_UP_FILES_PATH, 0777);
-			$exportFolder = START_UP_FILES_PATH . '/export';
-			mkdir($exportFolder);
-			chmod($exportFolder, 0777);
-		    $referencesFolder = $exportFolder . '/references';
-			mkdir($referencesFolder);
-			chmod($referencesFolder, 0777);
 		}
+        $exportFolder = START_UP_FILES_PATH . '/export';
+        if (!is_dir($exportFolder)) {
+            mkdir($exportFolder);
+            chmod($exportFolder, 0777);
+        }
+        $referencesFolder = $exportFolder . '/references';
+        if (!is_dir($referencesFolder)) {
+            mkdir($referencesFolder);
+            chmod($referencesFolder, 0777);
+        }
 	}
 
 	private function installErrorHandlers()
